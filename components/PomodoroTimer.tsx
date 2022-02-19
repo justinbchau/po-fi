@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Vibration } from 'react-native';
+import { Vibration, useWindowDimensions } from 'react-native';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
 import { Div, Text, Button, Icon } from 'react-native-magnus';
 import { Audio, AVPlaybackStatus } from 'expo-av';
@@ -132,6 +132,11 @@ export function PomodoroTimer() {
         }
     }
 
+    const { height } = useWindowDimensions();
+
+    const marginTop = height <= 667 ? 50 : 130;
+
+
     return (
         <Div>
             <Div alignItems='center'>
@@ -155,7 +160,7 @@ export function PomodoroTimer() {
 
             {/* Implement an Error component */}
 
-            <Div row mt="30%">
+            <Div row mt={marginTop}>
                 <Button
                     bg="primaryBlue"
                     h={60}

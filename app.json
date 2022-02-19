@@ -4,10 +4,10 @@
     "slug": "po-fi",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/pofi-icon.png",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
+      "image": "./assets/pofi-splash.png",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "updates": {
@@ -22,13 +22,15 @@
         "UIBackgroundModes": [
           "audio"
         ]
-      }
+      },
+      "bundleIdentifier": "com.jchau.pofi"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.jchau.pofi"
     },
     "web": {
       "favicon": "./assets/favicon.png"
