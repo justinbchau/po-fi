@@ -9,7 +9,7 @@ export default function Home() {
         <Div justifyContent='center' alignItems='center' >
             <Header />
             <PomodoroTimer />
-            <StatusBar style="auto" />
+            <StatusBar style="light" />
         </Div>
     );
 }
