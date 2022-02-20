@@ -248,11 +248,10 @@ export function PomodoroTimer() {
                     onComplete={() => onFinish()}
                     children={({ remainingTime }) => {
                         const minutes = Math.floor(remainingTime / 60)
-
                         const seconds = String(remainingTime % 60).padStart(2, '0');
 
                         return <Text fontWeight="bold"
-                            fontSize="7xl" color='white'>{minutes}:{seconds_text}</Text>
+                            fontSize="7xl" color='white'>{minutes}:{seconds}</Text>
                     }}
                 />
             </Div>
@@ -286,7 +285,8 @@ export function PomodoroTimer() {
                     rounded="circle"
                     shadow="md"
                     borderless
-                    onPress={ async () => await playNextSound() }
+                    onPress={ () => playNextSound() }
+                    disabled={!playing}
                 >
                     <Icon name="skip-forward" color="white" fontFamily="Feather" fontSize="2xl" />
                 </Button>
