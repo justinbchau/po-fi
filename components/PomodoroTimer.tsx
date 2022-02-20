@@ -278,7 +278,7 @@ export function PomodoroTimer() {
                         return startTimer();
                     }}
                 >
-                    {playingStateIcon}
+                    <Icon name={playing ? "pause" : "play"} color="white" fontFamily="Feather" fontSize="2xl" />
                 </Button>
 
                 <Button
