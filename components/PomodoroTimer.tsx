@@ -267,6 +267,19 @@ export function PomodoroTimer() {
                     rounded="circle"
                     shadow="md"
                     borderless
+                    onPress={() => resetTimer()}
+                >
+                    <Icon name="rotate-ccw" color="white" fontFamily="Feather" fontSize="2xl" />
+                </Button>
+
+                <Button
+                    bg="primaryBlue"
+                    h={60}
+                    w={60}
+                    mx="xl"
+                    rounded="circle"
+                    shadow="md"
+                    borderless
                     onPress={() => {
                         if (playing)
                             return pauseTimer();
@@ -289,19 +302,6 @@ export function PomodoroTimer() {
                     disabled={!playing}
                 >
                     <Icon name="skip-forward" color="white" fontFamily="Feather" fontSize="2xl" />
-                </Button>
-
-                <Button
-                    bg="primaryBlue"
-                    h={60}
-                    w={60}
-                    mx="xl"
-                    rounded="circle"
-                    shadow="md"
-                    borderless
-                    onPress={() => resetTimer()}
-                >
-                    <Icon name="rotate-ccw" color="white" fontFamily="Feather" fontSize="2xl" />
                 </Button>
             </Div>
 
