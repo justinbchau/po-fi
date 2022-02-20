@@ -68,24 +68,36 @@ export function PomodoroTimer() {
             }
         } else {
             if (status.didJustFinish && !status.isLooping) {
-                await nextSound();
+                await playNextSound();
             }
+        }
+    }
+
+    function nextSound() {
+        if (currentSong > playlist.length - 1) {
+            setCurrentSong(0);
+        } else {
+            setCurrentSong(currentSong + 1);
         }
     }
 
     /**
      * Function that changes the current sound, loads it and then play.
      */
-    async function nextSound() {
+    async function playNextSound() {
         console.log('Playing next sound');
-        setCurrentSong(currentSong + 1);
+
+        await unloadSound();
+        nextSound();
+        await playSound();
     }
 
     async function playSound() {
         console.log('Playing Sound');
         // Checks if there is a song before trying to play it.
         if (!soundRef.current) await loadSound();
-        await soundRef.current?.playAsync();
+        // Check if not playing so that we don't call playAsync twice because of the loadSound() function
+        if (!playing) await soundRef.current?.playAsync();
     }
 
 
@@ -147,11 +159,7 @@ export function PomodoroTimer() {
             setTime(customTime.WORK);
             setPlaying(false)
             setKey(key + 1);
-            if (currentSong > playlist.length - 1) {
-                setCurrentSong(0);
-            } else {
-                setCurrentSong(currentSong + 1);
-            }
+            nextSound();
         }
     }
 
@@ -159,6 +167,9 @@ export function PomodoroTimer() {
 
     const marginTop = height <= 667 ? 50 : 130;
 
+    const playingStateIcon = playing ? 
+    <Icon name="pause" color="white" fontFamily="Feather" fontSize="2xl" /> :
+    <Icon name="play" color="white" fontFamily="Feather" fontSize="2xl" />;
 
     return (
         <Div>
@@ -240,17 +251,19 @@ export function PomodoroTimer() {
                     onComplete={() => onFinish()}
                     children={({ remainingTime }) => {
                         const minutes = Math.floor(remainingTime / 60)
+
                         const seconds = remainingTime % 60
+                        const seconds_text = seconds >= 10 ? seconds : `0${seconds}`
 
                         return <Text fontWeight="bold"
-                            fontSize="7xl" color='white'>{minutes}:{seconds}</Text>
+                            fontSize="7xl" color='white'>{minutes}:{seconds_text}</Text>
                     }}
                 />
             </Div>
 
             {/* Implement an Error component */}
 
-            <Div row mt={marginTop}>
+            <Div row justifyContent="center" mt={marginTop}>
                 <Button
                     bg="primaryBlue"
                     h={60}
@@ -259,10 +272,16 @@ export function PomodoroTimer() {
                     rounded="circle"
                     shadow="md"
                     borderless
-                    onPress={() => startTimer()}
+                    onPress={() => {
+                        if (playing)
+                            return pauseTimer();
+
+                        return startTimer();
+                    }}
                 >
-                    <Icon name="play" color="white" fontFamily="Feather" fontSize="2xl" />
+                    {playingStateIcon}
                 </Button>
+
                 <Button
                     bg="primaryBlue"
                     h={60}
@@ -271,10 +290,11 @@ export function PomodoroTimer() {
                     rounded="circle"
                     shadow="md"
                     borderless
-                    onPress={() => pauseTimer()}
+                    onPress={ async () => await playNextSound() }
                 >
-                    <Icon name="pause" color="white" fontFamily="Feather" fontSize="2xl" />
+                    <Icon name="skip-forward" color="white" fontFamily="Feather" fontSize="2xl" />
                 </Button>
+
                 <Button
                     bg="primaryBlue"
                     h={60}
