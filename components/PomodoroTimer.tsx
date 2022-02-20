@@ -252,8 +252,7 @@ export function PomodoroTimer() {
                     children={({ remainingTime }) => {
                         const minutes = Math.floor(remainingTime / 60)
 
-                        const seconds = remainingTime % 60
-                        const seconds_text = seconds >= 10 ? seconds : `0${seconds}`
+                        const seconds = String(remainingTime % 60).padStart(2, '0');
 
                         return <Text fontWeight="bold"
                             fontSize="7xl" color='white'>{minutes}:{seconds_text}</Text>
