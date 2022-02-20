@@ -167,9 +167,6 @@ export function PomodoroTimer() {
 
     const marginTop = height <= 667 ? 50 : 130;
 
-    const playingStateIcon = playing ? 
-    <Icon name="pause" color="white" fontFamily="Feather" fontSize="2xl" /> :
-    <Icon name="play" color="white" fontFamily="Feather" fontSize="2xl" />;
 
     return (
         <Div>
