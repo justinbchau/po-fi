@@ -178,21 +178,21 @@ export function PomodoroTimer() {
                     <Icon color='white' name="close" />
                 </Button>
                 <Div flex={1} justifyContent="center" alignItems='center'>
-                    <Div flexDir="row" justifyContent='space-between' w={150} my={10}>
+                    <Div flexDir="row" justifyContent='space-between' alignItems='center' w={150} my={10}>
                         <Text>Time</Text>
                         <Input 
                             w={100} 
                             defaultValue={(customTime.WORK / 60).toString()} 
-                            keyboardType="number-pad" 
+                            keyboardType="numeric" 
                             onChangeText={(text) => parseFloat(text) && setCustomTime({...customTime, WORK: parseFloat(text) * 60})} 
                         />
                     </Div>
-                    <Div flexDir="row" justifyContent='space-between' w={150} my={10}>
+                    <Div flexDir="row" justifyContent='space-between' alignItems='center' w={150} my={10}>
                         <Text>Break</Text>
                         <Input 
                             w={100} 
                             defaultValue={(customTime.BREAK / 60).toString()} 
-                            keyboardType="number-pad" 
+                            keyboardType="numeric" 
                             onChangeText={(text) => parseFloat(text) && setCustomTime({...customTime, BREAK: parseFloat(text) * 60})} 
                         />
                     </Div>
@@ -204,8 +204,10 @@ export function PomodoroTimer() {
                             mx="xl"
                             shadow="md"
                             alignSelf='center'
-                            onPress={() =>  {setVisible(false); resetTimer()}}
-                        >
+                            onPress={() =>  {
+                                setVisible(false); 
+                                resetTimer()}
+                            }>
                             <Text color='white'>Submit</Text>
                         </Button>
                     </Div>
