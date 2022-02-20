@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Vibration, useWindowDimensions } from 'react-native';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
 import { Div, Text, Button, Icon } from 'react-native-magnus';
@@ -22,35 +22,42 @@ export function PomodoroTimer() {
     const soundRef = useRef<Sound | null>(null);
     const bellRef = useRef<Sound | null>(null)
 
+    /**
+     * Loads the sound and automatically plays if "playing" is true.
+     */
+    const loadSound = async () => {
+        const { sound } = await Audio.Sound.createAsync(
+            { uri: playlist[currentSong].uri },
+            { shouldPlay: playing }
+        );
+        soundRef.current = sound;
+        soundRef.current?.setOnPlaybackStatusUpdate(onStatusUpdate);
+    };
+
+    /**
+     * Loads the sfx
+     */
+    const loadSfx = useCallback(async () => {
+        const { sound } = await Audio.Sound.createAsync(
+            { uri: sfx[0].uri },
+        );
+        bellRef.current = sound;
+    }, []);
+
     useEffect(() => {
         Audio.setAudioModeAsync({
             playsInSilentModeIOS: true,
             staysActiveInBackground: true,
-        })
-        const loadSound = async () => {
-            const { sound } = await Audio.Sound.createAsync(
-                { uri: playlist[currentSong].uri },
-            );
-            soundRef.current = sound;
-            soundRef.current?.setOnPlaybackStatusUpdate(onStatusUpdate);
-        };
+        });
+    }, []);
+
+    useEffect(() => {
         loadSound();
     }, [currentSong]);
 
     useEffect(() => {
-        Audio.setAudioModeAsync({
-            playsInSilentModeIOS: true,
-            staysActiveInBackground: true,
-        })
-        const loadSound = async () => {
-            const { sound } = await Audio.Sound.createAsync(
-                { uri: sfx[0].uri },
-            );
-            bellRef.current = sound;
-        };
-        loadSound();
-    }, [playing]);
-
+        loadSfx();
+    }, [loadSfx]);
 
     const onStatusUpdate = async (status: AVPlaybackStatus) => {
         if (!status.isLoaded) {
@@ -59,14 +66,23 @@ export function PomodoroTimer() {
             }
         } else {
             if (status.didJustFinish && !status.isLooping) {
-                setCurrentSong(currentSong + 1);
-                await soundRef.current?.playAsync();
+                await nextSound();
             }
         }
     }
 
+    /**
+     * Function that changes the current sound, loads it and then play.
+     */
+    async function nextSound() {
+        console.log('Playing next sound');
+        setCurrentSong(currentSong + 1);
+    }
+
     async function playSound() {
         console.log('Playing Sound');
+        // Checks if there is a song before trying to play it.
+        if (!soundRef.current) await loadSound();
         await soundRef.current?.playAsync();
     }
 
@@ -78,7 +94,7 @@ export function PomodoroTimer() {
 
     async function replaySound() {
         console.log('Replaying Sound');
-        await soundRef.current?.stopAsync();
+        await soundRef.current?.replayAsync(); // Replay the current sound.
     }
 
     async function unloadSound() {
@@ -101,6 +117,9 @@ export function PomodoroTimer() {
     const resetTimer = () => {
         setTime(TIMES.WORK);
         setKey(key + 1);
+
+        // Starts playing if it was paused.
+        if (!playing) setPlaying(true);
         replaySound();
     }
 
