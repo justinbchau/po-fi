@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { Vibration, useWindowDimensions } from 'react-native';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
-import { Div, Text, Button, Icon } from 'react-native-magnus';
+import { Div, Text, Button, Icon, Modal, Input } from 'react-native-magnus';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { Sound } from 'expo-av/build/Audio';
 
@@ -17,7 +17,9 @@ export function PomodoroTimer() {
     const [playing, setPlaying] = React.useState(false);
     const [key, setKey] = React.useState(0);
     const [time, setTime] = React.useState(TIMES.WORK);
+    const [customTime, setCustomTime] = React.useState(TIMES);
     const [currentSong, setCurrentSong] = React.useState(0);
+    const [visible, setVisible] = React.useState(false);
 
     const soundRef = useRef<Sound | null>(null);
     const bellRef = useRef<Sound | null>(null)
@@ -115,7 +117,7 @@ export function PomodoroTimer() {
 
 
     const resetTimer = () => {
-        setTime(TIMES.WORK);
+        setTime(customTime.WORK);
         setKey(key + 1);
 
         // Starts playing if it was paused.
@@ -128,11 +130,11 @@ export function PomodoroTimer() {
     }
 
     const onFinish = () => {
-        if (time === TIMES.WORK) {
+        if (time === customTime.WORK) {
             // Switching to Break
             playBell();
             Vibration.vibrate(1000);
-            setTime(TIMES.BREAK);
+            setTime(customTime.BREAK);
             setPlaying(true)
             setKey(key + 1);
             unloadSound();
@@ -140,7 +142,7 @@ export function PomodoroTimer() {
             // Switching back to work
             bellRef.current?.replayAsync();
             Vibration.vibrate(1000);
-            setTime(TIMES.WORK);
+            setTime(customTime.WORK);
             setPlaying(false)
             setKey(key + 1);
             if (currentSong > playlist.length - 1) {
@@ -158,6 +160,70 @@ export function PomodoroTimer() {
 
     return (
         <Div>
+            <Modal isVisible={visible}>
+                <Button
+                    bg="primaryBlue"
+                    h={40}
+                    w={40}
+                    mx="xl"
+                    rounded="circle"
+                    shadow="md"
+                    borderless
+                    position="absolute"
+                    top={50}
+                    right={15}
+                    zIndex={2}
+                    onPress={() =>  setVisible(false)}
+                >
+                    <Icon color='white' name="close" />
+                </Button>
+                <Div flex={1} justifyContent="center" alignItems='center'>
+                    <Div flexDir="row" justifyContent='space-between' w={150} my={10}>
+                        <Text>Time</Text>
+                        <Input 
+                            w={100} 
+                            defaultValue={(customTime.WORK / 60).toString()} 
+                            keyboardType="number-pad" 
+                            onChangeText={(text) => parseFloat(text) && setCustomTime({...customTime, WORK: parseFloat(text) * 60})} 
+                        />
+                    </Div>
+                    <Div flexDir="row" justifyContent='space-between' w={150} my={10}>
+                        <Text>Break</Text>
+                        <Input 
+                            w={100} 
+                            defaultValue={(customTime.BREAK / 60).toString()} 
+                            keyboardType="number-pad" 
+                            onChangeText={(text) => parseFloat(text) && setCustomTime({...customTime, BREAK: parseFloat(text) * 60})} 
+                        />
+                    </Div>
+                    <Div w={150} my={10}>
+                        <Button
+                            bg="primaryBlue"
+                            h={40}
+                            w={150}
+                            mx="xl"
+                            shadow="md"
+                            alignSelf='center'
+                            onPress={() =>  {setVisible(false); resetTimer()}}
+                        >
+                            <Text color='white'>Submit</Text>
+                        </Button>
+                    </Div>
+                </Div>
+            </Modal>
+            <Button
+                bg="primaryBlue"
+                h={40}
+                w={40}
+                mx="xl"
+                rounded="circle"
+                shadow="md"
+                borderless
+                alignSelf='flex-end'
+                onPress={() => setVisible(true)}
+            >
+                <Icon name="settings" color="white" fontFamily="Feather" fontSize="lg" />
+            </Button>
             <Div alignItems='center'>
                 <CountdownCircleTimer
                     key={key}
