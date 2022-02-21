@@ -136,6 +136,9 @@ export function PomodoroTimer() {
         if (shouldPlay) {
             setPlaying(true);
             replaySound();
+        } else {
+            setPlaying(false);
+            pauseSound()
         }
     }
 
@@ -165,7 +168,7 @@ export function PomodoroTimer() {
 
     const { height } = useWindowDimensions();
 
-    const marginTop = height <= 667 ? 50 : 130;
+    const marginTop = height <= 667 ? 80 : 130;
 
 
     return (
@@ -267,7 +270,7 @@ export function PomodoroTimer() {
                     rounded="circle"
                     shadow="md"
                     borderless
-                    onPress={() => resetTimer()}
+                    onPress={() => resetTimer(false)}
                 >
                     <Icon name="rotate-ccw" color="white" fontFamily="Feather" fontSize="2xl" />
                 </Button>
@@ -298,7 +301,7 @@ export function PomodoroTimer() {
                     rounded="circle"
                     shadow="md"
                     borderless
-                    onPress={ () => playNextSound() }
+                    onPress={() => playNextSound()}
                     disabled={!playing}
                 >
                     <Icon name="skip-forward" color="white" fontFamily="Feather" fontSize="2xl" />
