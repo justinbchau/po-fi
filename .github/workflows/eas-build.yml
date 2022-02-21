@@ -23,4 +23,4 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
       - name: Build on EAS
-        run: eas build --platform all --non-interactive
+        run: eas build -p ios --profile production --auto-submit
