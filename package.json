@@ -1,10 +1,11 @@
 {
   "name": "po-fi",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "scripts": {
     "start": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",
+    "submit-ios": "eas build -p ios --profile production --auto-submit",
     "web": "expo start --web",
     "eject": "expo eject"
   },

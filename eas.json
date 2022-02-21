@@ -13,6 +13,12 @@
     "production": {}
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "justinchau31@gmail.com",
+        "ascAppId": "1610885022",
+        "appleTeamId": "CPHGQNPK2S"
+      }
+    }
   }
 }

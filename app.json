@@ -23,7 +23,8 @@
           "audio"
         ]
       },
-      "bundleIdentifier": "com.jchau.pofi"
+      "bundleIdentifier": "com.jchau.pofi",
+      "buildNumber": "3"
     },
     "android": {
       "adaptiveIcon": {
