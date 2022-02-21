@@ -68,24 +68,36 @@ export function PomodoroTimer() {
             }
         } else {
             if (status.didJustFinish && !status.isLooping) {
-                await nextSound();
+                await playNextSound();
             }
+        }
+    }
+
+    function nextSound() {
+        if (currentSong > playlist.length - 1) {
+            setCurrentSong(0);
+        } else {
+            setCurrentSong(currentSong + 1);
         }
     }
 
     /**
      * Function that changes the current sound, loads it and then play.
      */
-    async function nextSound() {
+    async function playNextSound() {
         console.log('Playing next sound');
-        setCurrentSong(currentSong + 1);
+
+        await unloadSound();
+        nextSound();
+        await playSound();
     }
 
     async function playSound() {
         console.log('Playing Sound');
         // Checks if there is a song before trying to play it.
         if (!soundRef.current) await loadSound();
-        await soundRef.current?.playAsync();
+        // Check if not playing so that we don't call playAsync twice because of the loadSound() function
+        if (!playing) await soundRef.current?.playAsync();
     }
 
 
@@ -124,6 +136,9 @@ export function PomodoroTimer() {
         if (shouldPlay) {
             setPlaying(true);
             replaySound();
+        } else {
+            setPlaying(false);
+            pauseSound()
         }
     }
 
@@ -147,17 +162,13 @@ export function PomodoroTimer() {
             setTime(customTime.WORK);
             setPlaying(false)
             setKey(key + 1);
-            if (currentSong > playlist.length - 1) {
-                setCurrentSong(0);
-            } else {
-                setCurrentSong(currentSong + 1);
-            }
+            nextSound();
         }
     }
 
     const { height } = useWindowDimensions();
 
-    const marginTop = height <= 667 ? 50 : 130;
+    const marginTop = height <= 667 ? 80 : 130;
 
 
     return (
@@ -240,7 +251,7 @@ export function PomodoroTimer() {
                     onComplete={() => onFinish()}
                     children={({ remainingTime }) => {
                         const minutes = Math.floor(remainingTime / 60)
-                        const seconds = remainingTime % 60
+                        const seconds = String(remainingTime % 60).padStart(2, '0');
 
                         return <Text fontWeight="bold"
                             fontSize="7xl" color='white'>{minutes}:{seconds}</Text>
@@ -250,7 +261,7 @@ export function PomodoroTimer() {
 
             {/* Implement an Error component */}
 
-            <Div row mt={marginTop}>
+            <Div row justifyContent="center" mt={marginTop}>
                 <Button
                     bg="primaryBlue"
                     h={60}
@@ -259,33 +270,41 @@ export function PomodoroTimer() {
                     rounded="circle"
                     shadow="md"
                     borderless
-                    onPress={() => startTimer()}
-                >
-                    <Icon name="play" color="white" fontFamily="Feather" fontSize="2xl" />
-                </Button>
-                <Button
-                    bg="primaryBlue"
-                    h={60}
-                    w={60}
-                    mx="xl"
-                    rounded="circle"
-                    shadow="md"
-                    borderless
-                    onPress={() => pauseTimer()}
-                >
-                    <Icon name="pause" color="white" fontFamily="Feather" fontSize="2xl" />
-                </Button>
-                <Button
-                    bg="primaryBlue"
-                    h={60}
-                    w={60}
-                    mx="xl"
-                    rounded="circle"
-                    shadow="md"
-                    borderless
-                    onPress={() => resetTimer()}
+                    onPress={() => resetTimer(false)}
                 >
                     <Icon name="rotate-ccw" color="white" fontFamily="Feather" fontSize="2xl" />
+                </Button>
+
+                <Button
+                    bg="primaryBlue"
+                    h={60}
+                    w={60}
+                    mx="xl"
+                    rounded="circle"
+                    shadow="md"
+                    borderless
+                    onPress={() => {
+                        if (playing)
+                            return pauseTimer();
+
+                        return startTimer();
+                    }}
+                >
+                    <Icon name={playing ? "pause" : "play"} color="white" fontFamily="Feather" fontSize="2xl" />
+                </Button>
+
+                <Button
+                    bg="primaryBlue"
+                    h={60}
+                    w={60}
+                    mx="xl"
+                    rounded="circle"
+                    shadow="md"
+                    borderless
+                    onPress={() => playNextSound()}
+                    disabled={!playing}
+                >
+                    <Icon name="skip-forward" color="white" fontFamily="Feather" fontSize="2xl" />
                 </Button>
             </Div>
 

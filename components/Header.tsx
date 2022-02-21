@@ -6,7 +6,7 @@ export function Header() {
 
     const { height } = useWindowDimensions();
 
-    const marginBottom = height <= 667 ? 100 : 150;
+    const marginBottom = height <= 667 ? 60 : 150;
 
 
 
