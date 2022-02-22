@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { Vibration, useWindowDimensions } from 'react-native';
+import { Vibration, useWindowDimensions, SafeAreaView, View, StyleSheet } from 'react-native';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
 import { Div, Text, Button, Icon, Modal, Input } from 'react-native-magnus';
 import { Audio, AVPlaybackStatus } from 'expo-av';
@@ -173,7 +173,63 @@ export function PomodoroTimer() {
 
     return (
         <Div>
-            <Modal isVisible={visible}>
+            {/* Add a safe area widget to add the background color to */}
+                <Modal isVisible={visible}>
+                    <View style={styles.container}>
+                        <Button
+                            bg="primaryBlue"
+                            h={40}
+                            w={40}
+                            mx="xl"
+                            rounded="circle"
+                            shadow="md"
+                            borderless
+                            position="absolute"
+                            top={50}
+                            right={15}
+                            zIndex={2}
+                            onPress={() => setVisible(false)}
+                        >
+                            <Icon color='white' name="close" />
+                        </Button>
+                        <Div flex={1} justifyContent="center" alignItems='center'>
+                            <Div flexDir="row" justifyContent='space-between' alignItems='center' w={150} my={10}>
+                                <Text color="white">Time</Text>
+                                <Input
+                                    w={100}
+                                    defaultValue={(customTime.WORK / 60).toString()}
+                                    keyboardType="numeric"
+                                    onChangeText={(text) => parseFloat(text) && setCustomTime({ ...customTime, WORK: parseFloat(text) * 60 })}
+                                />
+                            </Div>
+                            <Div flexDir="row" justifyContent='space-between' alignItems='center' w={150} my={10}>
+                                <Text color="white">Break</Text>
+                                <Input
+                                    w={100}
+                                    defaultValue={(customTime.BREAK / 60).toString()}
+                                    keyboardType="numeric"
+                                    onChangeText={(text) => parseFloat(text) && setCustomTime({ ...customTime, BREAK: parseFloat(text) * 60 })}
+                                />
+                            </Div>
+                            <Div w={150} my={10}>
+                                <Button
+                                    bg="primaryBlue"
+                                    h={40}
+                                    w={150}
+                                    mx="xl"
+                                    shadow="md"
+                                    alignSelf='center'
+                                    onPress={() => {
+                                        setVisible(false);
+                                        resetTimer(false)
+                                    }
+                                    }>
+                                    <Text color='white'>Submit</Text>
+                                </Button>
+                            </Div>
+                        </Div>
+                    </View>
+                </Modal>
                 <Button
                     bg="primaryBlue"
                     h={40}
@@ -182,132 +238,87 @@ export function PomodoroTimer() {
                     rounded="circle"
                     shadow="md"
                     borderless
-                    position="absolute"
-                    top={50}
-                    right={15}
-                    zIndex={2}
-                    onPress={() => setVisible(false)}
+                    alignSelf='flex-end'
+                    onPress={() => setVisible(true)}
                 >
-                    <Icon color='white' name="close" />
+                    <Icon name="settings" color="white" fontFamily="Feather" fontSize="lg" />
                 </Button>
-                <Div flex={1} justifyContent="center" alignItems='center'>
-                    <Div flexDir="row" justifyContent='space-between' alignItems='center' w={150} my={10}>
-                        <Text>Time</Text>
-                        <Input
-                            w={100}
-                            defaultValue={(customTime.WORK / 60).toString()}
-                            keyboardType="numeric"
-                            onChangeText={(text) => parseFloat(text) && setCustomTime({ ...customTime, WORK: parseFloat(text) * 60 })}
-                        />
-                    </Div>
-                    <Div flexDir="row" justifyContent='space-between' alignItems='center' w={150} my={10}>
-                        <Text>Break</Text>
-                        <Input
-                            w={100}
-                            defaultValue={(customTime.BREAK / 60).toString()}
-                            keyboardType="numeric"
-                            onChangeText={(text) => parseFloat(text) && setCustomTime({ ...customTime, BREAK: parseFloat(text) * 60 })}
-                        />
-                    </Div>
-                    <Div w={150} my={10}>
-                        <Button
-                            bg="primaryBlue"
-                            h={40}
-                            w={150}
-                            mx="xl"
-                            shadow="md"
-                            alignSelf='center'
-                            onPress={() => {
-                                setVisible(false);
-                                resetTimer(false)
-                            }
-                            }>
-                            <Text color='white'>Submit</Text>
-                        </Button>
-                    </Div>
+                <Div alignItems='center'>
+                    <CountdownCircleTimer
+                        key={key}
+                        isPlaying={playing}
+                        duration={time}
+                        colors={['#6C7BFF', '#F7B801', '#A30000', '#A30000']}
+                        colorsTime={[7, 5, 2, 0]}
+                        size={270}
+                        onComplete={() => onFinish()}
+                        children={({ remainingTime }) => {
+                            const minutes = Math.floor(remainingTime / 60)
+                            const seconds = String(remainingTime % 60).padStart(2, '0');
+
+                            return <Text fontWeight="bold"
+                                fontSize="7xl" color='white'>{minutes}:{seconds}</Text>
+                        }}
+                    />
                 </Div>
-            </Modal>
-            <Button
-                bg="primaryBlue"
-                h={40}
-                w={40}
-                mx="xl"
-                rounded="circle"
-                shadow="md"
-                borderless
-                alignSelf='flex-end'
-                onPress={() => setVisible(true)}
-            >
-                <Icon name="settings" color="white" fontFamily="Feather" fontSize="lg" />
-            </Button>
-            <Div alignItems='center'>
-                <CountdownCircleTimer
-                    key={key}
-                    isPlaying={playing}
-                    duration={time}
-                    colors={['#6C7BFF', '#F7B801', '#A30000', '#A30000']}
-                    colorsTime={[7, 5, 2, 0]}
-                    size={270}
-                    onComplete={() => onFinish()}
-                    children={({ remainingTime }) => {
-                        const minutes = Math.floor(remainingTime / 60)
-                        const seconds = String(remainingTime % 60).padStart(2, '0');
 
-                        return <Text fontWeight="bold"
-                            fontSize="7xl" color='white'>{minutes}:{seconds}</Text>
-                    }}
-                />
-            </Div>
+                {/* Implement an Error component */}
 
-            {/* Implement an Error component */}
+                <Div row justifyContent="center" mt={marginTop}>
+                    <Button
+                        bg="primaryBlue"
+                        h={60}
+                        w={60}
+                        mx="xl"
+                        rounded="circle"
+                        shadow="md"
+                        borderless
+                        onPress={() => resetTimer(false)}
+                    >
+                        <Icon name="rotate-ccw" color="white" fontFamily="Feather" fontSize="2xl" />
+                    </Button>
 
-            <Div row justifyContent="center" mt={marginTop}>
-                <Button
-                    bg="primaryBlue"
-                    h={60}
-                    w={60}
-                    mx="xl"
-                    rounded="circle"
-                    shadow="md"
-                    borderless
-                    onPress={() => resetTimer(false)}
-                >
-                    <Icon name="rotate-ccw" color="white" fontFamily="Feather" fontSize="2xl" />
-                </Button>
+                    <Button
+                        bg="primaryBlue"
+                        h={60}
+                        w={60}
+                        mx="xl"
+                        rounded="circle"
+                        shadow="md"
+                        borderless
+                        onPress={() => {
+                            if (playing)
+                                return pauseTimer();
 
-                <Button
-                    bg="primaryBlue"
-                    h={60}
-                    w={60}
-                    mx="xl"
-                    rounded="circle"
-                    shadow="md"
-                    borderless
-                    onPress={() => {
-                        if (playing)
-                            return pauseTimer();
+                            return startTimer();
+                        }}
+                    >
+                        <Icon name={playing ? "pause" : "play"} color="white" fontFamily="Feather" fontSize="2xl" />
+                    </Button>
 
-                        return startTimer();
-                    }}
-                >
-                    <Icon name={playing ? "pause" : "play"} color="white" fontFamily="Feather" fontSize="2xl" />
-                </Button>
-
-                <Button
-                    bg="primaryBlue"
-                    h={60}
-                    w={60}
-                    mx="xl"
-                    rounded="circle"
-                    shadow="md"
-                    borderless
-                    onPress={() => playNextSound()}
-                    disabled={!playing}
-                >
-                    <Icon name="skip-forward" color="white" fontFamily="Feather" fontSize="2xl" />
-                </Button>
-            </Div>
-
+                    <Button
+                        bg="primaryBlue"
+                        h={60}
+                        w={60}
+                        mx="xl"
+                        rounded="circle"
+                        shadow="md"
+                        borderless
+                        onPress={() => playNextSound()}
+                        disabled={!playing}
+                    >
+                        <Icon name="skip-forward" color="white" fontFamily="Feather" fontSize="2xl" />
+                    </Button>
+                </Div>
         </Div>
     );
 }
+
+// Add background color for the settings
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: '#2D2D2D',
+        height: '100%',
+        flex: 1,
+    }
+});
